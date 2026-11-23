@@ -1,0 +1,9 @@
+{
+  "license": "GPL-2.0-or-later (upstream @ffmpeg/core 0.11.0 single-thread build)",
+  "description": "Single-thread FFmpeg WebAssembly core loaded at runtime from a public CDN — not bundled in Worker assets. LGPL build without libx264 is insufficient for typical WebM→MP4; see /about.",
+  "coreJsUrl": "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js",
+  "coreWasmUrl": "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm",
+  "workerJsUrl": "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.worker.js",
+  "wasmBytes": 24800000,
+  "fallbackWasmBytes": 24800000
+}

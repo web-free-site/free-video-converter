@@ -1,0 +1,10 @@
+AGENT_BRIEF.md
+wrangler.toml
+package.json
+package-lock.json
+.git/
+node_modules/
+README.md
+src/
+scripts/
+vite.config.ts

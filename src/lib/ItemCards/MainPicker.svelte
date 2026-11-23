@@ -1,0 +1,141 @@
+<script lang="ts">
+    import Card from "../UIElements/Card/Card.svelte";
+    import { getLang } from "../..//ts/LanguageAdapt";
+    import Chip from "../UIElements/ChipElements/Chip.svelte";
+    import ChipContainer from "../UIElements/ChipElements/ChipContainer.svelte";
+    import Switch from "../UIElements/Switch.svelte";
+    import EncoderInfo from "../../ts/TabOptions/EncoderInfo";
+    import ConversionOptions from "../../ts/TabOptions/ConversionOptions.svelte";
+    import Writables from "../../ts/Writables.svelte";
+    import CustomInput from "./MainCards/CustomInput.svelte";
+    import FileMerge from "./MainCards/FileMerge.svelte";
+    import ImageConvert from "./MainCards/ImageConvert.svelte";
+    import ConversionStatus from "./ConversionStatus.svelte";
+    import { get } from "svelte/store";
+    import TrimContent from "./TrimContent.svelte";
+    import { slide } from "svelte/transition";
+    import MetadataAdd from "./MainCards/MetadataAdd.svelte";
+    import MediaEncoding from "./MainCards/MediaEncoding.svelte";
+    import AudioToVideo from "./MainCards/AudioToVideo.svelte";
+    import ExtraAudioToVideoSettings from "../InnerDialog/ExtraAudioToVideoSettings.svelte";
+    import ImageToVideo from "./MainCards/ImageToVideo.svelte";
+    /**
+     * What operation the user wants to do
+     */
+    let applicationPart = $state("MediaEnc");
+    $effect.pre(() => {
+        if (applicationPart === "Merge" || applicationPart === "Image")
+            ConversionOptions.trimOptions.id = 0;
+    });
+    /**
+     * If set to true, the Audio to Video dialog must be shown.
+     * This is done here (and not on the AudioToVideo Svelte component) to avoid render issues
+     */
+    let showCustomAudioToVideo = $state(false);
+
+    const {enabledCardCallback, changedMainTabCallback}: {
+        /**
+         * Function called when the user toggles audio or video encoding
+         */
+        enabledCardCallback: ({isVideo, result}: {isVideo: boolean, result: boolean}) => void,
+        /**
+         * Function called when the user changes the main tab to display
+         * @param selectedItem the ID of the tab to display
+         */
+        changedMainTabCallback: (selectedItem: string) => void
+    } = $props();
+</script>
+
+<Card>
+    <h2 class="center">{getLang("What do you want to do?")}</h2>
+    <i class="center">{getLang("Scroll to see more options")}</i><br />
+    <ChipContainer>
+        <Chip
+            selectionItems={[
+                {
+                    display: getLang("Media encoding"),
+                    id: "MediaEnc",
+                    selected: true,
+                },
+            ]}
+            onUserSelection={enabled => {
+                applicationPart = enabled;
+                changedMainTabCallback(enabled);
+            }}
+        ></Chip>
+    </ChipContainer>
+    {#if applicationPart === "MediaEnc"}
+        <MediaEncoding {enabledCardCallback}></MediaEncoding><br />
+    {:else if applicationPart === "Custom"}
+        <div
+            in:slide={{ duration: 600, delay: 600 }}
+            out:slide={{ duration: 600 }}
+        >
+            <CustomInput></CustomInput><br />
+        </div>
+    {:else if applicationPart === "Merge"}
+        <div
+            in:slide={{ duration: 600, delay: 600 }}
+            out:slide={{ duration: 600 }}
+        >
+            <FileMerge></FileMerge>
+        </div>
+    {:else if applicationPart === "Image"}
+        <div
+            in:slide={{ duration: 600, delay: 600 }}
+            out:slide={{ duration: 600 }}
+        >
+            <ImageConvert></ImageConvert>
+        </div>
+    {:else if applicationPart === "ImageToVideo"}
+            <div
+            in:slide={{ duration: 600, delay: 600 }}
+            out:slide={{ duration: 600 }}
+        >
+            <ImageToVideo></ImageToVideo>
+        </div>
+    {:else if applicationPart === "Metadata"}
+        <div
+            in:slide={{ duration: 600, delay: 600 }}
+            out:slide={{ duration: 600 }}
+        >
+            <MetadataAdd></MetadataAdd>
+        </div>
+    {:else if applicationPart === "AudioToVideo"}
+        <div
+            in:slide={{ duration: 600, delay: 600 }}
+            out:slide={{ duration: 600 }}
+        >
+            <AudioToVideo
+                showExtraDialog={() => {
+                    showCustomAudioToVideo = true;
+                }}
+            ></AudioToVideo><br />
+        </div>
+    {/if}<br />
+    {#if applicationPart !== "Merge" && applicationPart !== "Image" && applicationPart !== "ImageToVideo" && applicationPart !== "AudioToVideo"}
+        <TrimContent></TrimContent>
+    {/if}
+    <br />
+    <span>
+        {getLang(
+            "If you are re-encoding the media file, you can choose its options. Otherwise, choose the files on the next card",
+        )}</span
+    >
+</Card>
+{#if applicationPart === "AudioToVideo" && showCustomAudioToVideo}
+    <ExtraAudioToVideoSettings
+        closeFunction={() => {
+            showCustomAudioToVideo = false;
+        }}
+    ></ExtraAudioToVideoSettings>
+{/if}
+
+<style>
+    .center {
+        text-align: center;
+    }
+    i {
+        display: block;
+    }
+</style>
