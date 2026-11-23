@@ -1,9 +1,12 @@
-import type { FFmpegVersions, FfmpegConsole, FfmpegUrls } from "../../interfaces/ffmpeg";
+import type { FFmpegVersions, FfmpegConsole } from "../../interfaces/ffmpeg";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { toBlobURL } from "@ffmpeg/util";
 import Writables from "../Writables.svelte";
 import FFmpegFileNameHandler from "./FFmpegHandleFileName";
 import handleFileStringForOS from "../HandleFileString";
 import Settings from "../TabOptions/Settings.svelte";
 import ConsoleEvents from "./ConsoleEvents";
+import { loadFfmpegCoreManifest } from "./ffmpegCoreLoader";
 /**
  * An array that contains the number of seconds of each ffmpeg conversion
  */
@@ -78,112 +81,97 @@ export default class ffmpeg {
         Writables.currentConversionValue = Writables.currentConversionValue + 1;
         switch (type) {
             case "0.11.x":
-                import("ffmpeg11").then(async (ffmpeg) => {
-                    const obj = ffmpeg.createFFmpeg({
-                        wasmPath: typeof window.isLocal !== "undefined" ? URL.createObjectURL(await (await fetch("./assets/ffmpeg11/ffmpeg-core.wasm")).blob()) : "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.wasm",
-                        workerPath: typeof window.isLocal !== "undefined" ? URL.createObjectURL(await (await fetch("./assets/ffmpeg11/ffmpeg-core.worker.js")).blob()) : "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.worker.js",
-                        corePath: typeof window.isLocal !== "undefined" ? URL.createObjectURL(await (await fetch("./assets/ffmpeg11/ffmpeg-core.js")).blob()) : "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
-                    });
-                    this.load = async () => {
-                        !obj.isLoaded() && await obj.load();
-                    }
-                    this.writeFile = async (file) => {
-                        // Create, one path at a time, the directories necessary for the file
-                        const namePath = FFmpegFileNameHandler(file).split("/");
-                        const name = namePath.pop();
-                        if (!name) throw new Error("Undefined name array!");
-                        for (let i = 0; i < namePath.length; i++) obj.FS("mkdir", namePath.slice(0, i + 1).join("/"));
-                        obj.FS("writeFile", FFmpegFileNameHandler(file), new Uint8Array(await file.arrayBuffer()));
+            case "0.12.x": {
+                const obj = new FFmpeg();
+                const useMt = Settings.useMultiThreaded && !forceSingleThreaded;
+                this.load = async () => {
+                    if (obj.loaded) return;
+                    const manifest = await loadFfmpegCoreManifest();
+                    const coreURL = await toBlobURL(manifest.coreJsUrl, "text/javascript");
+                    const wasmURL = await toBlobURL(manifest.coreWasmUrl, "application/wasm");
+                    const loadConfig: { coreURL: string; wasmURL: string; workerURL?: string } = {
+                        coreURL,
+                        wasmURL,
                     };
-                    this.readFile = async (name) => {
-                        return obj.FS("readFile", name);
+                    if (useMt && manifest.workerJsUrl) {
+                        loadConfig.workerURL = await toBlobURL(manifest.workerJsUrl, "text/javascript");
                     }
-                    this.exec = async (command) => {
-                        await obj.run(...command);
+                    try {
+                        await obj.load(loadConfig);
+                    } finally {
+                        URL.revokeObjectURL(coreURL);
+                        URL.revokeObjectURL(wasmURL);
+                        if (loadConfig.workerURL) URL.revokeObjectURL(loadConfig.workerURL);
                     }
-                    obj.setLogger(({ message }) => {
-                        message === "Conversion failed!" && (Writables.conversionFailedDate = Date.now());
-                        updateConsole({ str: message, operation: this.operationId });
-                        document.getElementById("addContent")?.scrollTo({ top: document.getElementById("addContent")?.scrollHeight, behavior: "smooth" })
-                    });
-                    this.removeFile = async (file) => {
-                        obj.FS("unlink", typeof file === "string" ? file : FFmpegFileNameHandler(file));
-                    }
-                    this.exit = () => obj.exit();
-                    obj.setProgress(({ ratio }) => Writables.conversionProgress[this.operationId] = ratio);
-                    this.#resolvePromise();
-                });
-                break;
-            case "0.12.x":
-                import("ffmpeg12").then((ffmpeg) => {
-                    const obj = new ffmpeg.FFmpeg();
-                    this.load = async () => {
-                        !obj.loaded && await obj.load({
-                            coreURL: URL.createObjectURL(await (await fetch(typeof window.isLocal !== "undefined" ? `./assets/ffmpeg12/ffmpeg-core${Settings.useMultiThreaded && !forceSingleThreaded ? "mt" : ""}.js` : `https://unpkg.com/@ffmpeg/core${Settings.useMultiThreaded && !forceSingleThreaded ? "-mt" : ""}@0.12.6/dist/esm/ffmpeg-core.js`)).blob()),
-                            wasmURL: URL.createObjectURL(await (await fetch(typeof window.isLocal !== "undefined" ? `./assets/ffmpeg12/ffmpeg-core${Settings.useMultiThreaded && !forceSingleThreaded ? "mt" : ""}.wasm` : `https://unpkg.com/@ffmpeg/core${Settings.useMultiThreaded && !forceSingleThreaded ? "-mt" : ""}@0.12.6/dist/esm/ffmpeg-core.wasm`)).blob()),
-                            workerURL: URL.createObjectURL(await (await fetch(typeof window.isLocal !== "undefined" ? "./assets/ffmpeg12/ffmpeg-core.worker.js" : "https://unpkg.com/@ffmpeg/core-mt@0.12.6/dist/esm/ffmpeg-core.worker.js")).blob())
-                        });
-                    }
-                    this.writeFile = async (file, alsoOnOS) => {
-                        this.isMounted = Settings.enableWorkerFS;
-                        // Create, one path at a time, the directories necessary for the file
-                        const namePath = FFmpegFileNameHandler(file).split("/");
-                        const name = namePath.pop();
-                        this.isMounted && !alsoOnOS && namePath.unshift("mount");
-                        if (!name) throw new Error("Undefined name array!");
-                        for (let i = 0; i < namePath.length; i++) {
-                            try {
-                                await obj.createDir(namePath.slice(0, i + 1).join("/"));
-                            } catch (ex) {
-                                console.warn(ex);
-                            }
-                        }
-                        if (this.isMounted && !alsoOnOS) {
-                            const path = namePath.join("/");
-                            if (!this.#filesToMount[path]) this.#filesToMount[path] = [];
-                            this.#filesToMount[path].push(file); // Add to that path the file. It'll be mounted when the command is executed.
-                        } else await obj.writeFile(FFmpegFileNameHandler(file), new Uint8Array(await file.arrayBuffer()));
-                    }
-                    this.readFile = async (name) => {
-                        return await obj.readFile(name) as Uint8Array;
-                    }
-                    this.exec = (command) => {
-                        return new Promise<void>(async (resolve, reject) => {
-                            if (this.isMounted) {
-                                for (let i = 0; i < command.length; i++) {
-                                    if (command[i].toLowerCase() === "-i" && (!command[i + 1].startsWith("__FfmpegWebExclusive__") || command[i + 1].startsWith("__FfmpegWebExclusive__Reuploaded"))) command[i + 1] = `mount/${command[i + 1]}`;
-                                }
-                                for (const item in this.#filesToMount) {
-                                    if (this.#filesAlreadyMounted.indexOf(item) !== -1) continue;
-                                    await obj.mount("WORKERFS", { files: this.#filesToMount[item] }, item);
-                                    this.#filesAlreadyMounted.push(item);
-                                }
-                            }
-                            (await obj.exec(command)) === 0 ? resolve() : reject();
-                        })
-                    }
-                    obj.on("log", ({ message }) => {
-                        message === "Conversion failed!" && (Writables.conversionFailedDate = Date.now());
-                        updateConsole({ str: message, operation: this.operationId });
-                        document.getElementById("addContent")?.scrollTo({ top: document.getElementById("addContent")?.scrollHeight, behavior: "smooth" })
-                    });
-                    this.removeFile = async (file, isFromVirtualMemory) => {
-                        const path = typeof file === "string" ? file : FFmpegFileNameHandler(file);
+                };
+                this.writeFile = async (file, alsoOnOS) => {
+                    this.isMounted = Settings.enableWorkerFS;
+                    const namePath = FFmpegFileNameHandler(file).split("/");
+                    const name = namePath.pop();
+                    this.isMounted && !alsoOnOS && namePath.unshift("mount");
+                    if (!name) throw new Error("Undefined name array!");
+                    for (let i = 0; i < namePath.length; i++) {
                         try {
-                            if (this.isMounted && !isFromVirtualMemory) {
-                                await obj.unmount(`mount/${path.substring(0, Math.max(0, path.lastIndexOf("/")))}`);
-                                const index = this.#filesAlreadyMounted.indexOf(`mount${path.indexOf("/") === -1 ? "" : "/"}${path.substring(0, Math.max(0, path.lastIndexOf("/")))}`);
-                                index !== -1 && this.#filesAlreadyMounted.splice(index, 1);
-                            } else await obj.deleteFile(path);
+                            await obj.createDir(namePath.slice(0, i + 1).join("/"));
                         } catch (ex) {
                             console.warn(ex);
                         }
                     }
-                    this.exit = () => obj.terminate();
-                    obj.on("progress", ({ progress }) => Writables.conversionProgress[this.operationId] = progress);
-                    this.#resolvePromise();
+                    if (this.isMounted && !alsoOnOS) {
+                        const path = namePath.join("/");
+                        if (!this.#filesToMount[path]) this.#filesToMount[path] = [];
+                        this.#filesToMount[path].push(file);
+                    } else await obj.writeFile(FFmpegFileNameHandler(file), new Uint8Array(await file.arrayBuffer()));
+                };
+                this.readFile = async (name) => {
+                    return (await obj.readFile(name)) as Uint8Array;
+                };
+                this.exec = (command) => {
+                    return new Promise<void>(async (resolve, reject) => {
+                        if (this.isMounted) {
+                            for (let i = 0; i < command.length; i++) {
+                                if (
+                                    command[i].toLowerCase() === "-i" &&
+                                    (!command[i + 1].startsWith("__FfmpegWebExclusive__") ||
+                                        command[i + 1].startsWith("__FfmpegWebExclusive__Reuploaded"))
+                                )
+                                    command[i + 1] = `mount/${command[i + 1]}`;
+                            }
+                            for (const item in this.#filesToMount) {
+                                if (this.#filesAlreadyMounted.indexOf(item) !== -1) continue;
+                                await obj.mount("WORKERFS", { files: this.#filesToMount[item] }, item);
+                                this.#filesAlreadyMounted.push(item);
+                            }
+                        }
+                        (await obj.exec(command)) === 0 ? resolve() : reject();
+                    });
+                };
+                obj.on("log", ({ message }) => {
+                    message === "Conversion failed!" && (Writables.conversionFailedDate = Date.now());
+                    updateConsole({ str: message, operation: this.operationId });
+                    document
+                        .getElementById("addContent")
+                        ?.scrollTo({ top: document.getElementById("addContent")?.scrollHeight, behavior: "smooth" });
                 });
+                this.removeFile = async (file, isFromVirtualMemory) => {
+                    const path = typeof file === "string" ? file : FFmpegFileNameHandler(file);
+                    try {
+                        if (this.isMounted && !isFromVirtualMemory) {
+                            await obj.unmount(`mount/${path.substring(0, Math.max(0, path.lastIndexOf("/")))}`);
+                            const index = this.#filesAlreadyMounted.indexOf(
+                                `mount${path.indexOf("/") === -1 ? "" : "/"}${path.substring(0, Math.max(0, path.lastIndexOf("/")))}`,
+                            );
+                            index !== -1 && this.#filesAlreadyMounted.splice(index, 1);
+                        } else await obj.deleteFile(path);
+                    } catch (ex) {
+                        console.warn(ex);
+                    }
+                };
+                this.exit = () => obj.terminate();
+                obj.on("progress", ({ progress }) => (Writables.conversionProgress[this.operationId] = progress));
+                this.#resolvePromise();
                 break;
+            }
             case "native": {
                 const ipcRenderer = window.nativeOperations;
                 this.native = true;

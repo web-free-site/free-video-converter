@@ -13,7 +13,7 @@ import Writables from "../Writables.svelte";
  * @param handle if provided, the files will be saved using the File System API
  */
 export default async function ImageLogic(files: File[], handle?: FileSystemDirectoryHandle) {
-    const obj = new ffmpeg(Settings.version as "0.11.x");
+    const obj = new ffmpeg(Settings.version as "0.12.x");
     await obj.promise;
     CreateTopDialog(`${getLang("Started operation")} ${obj.operationId + 1}! ${getLang(`Change the Operation ID from the "Conversion Status" tab to see the current progress.`)}`, "OperationStarted");
     const ffmpegOperation = new FfmpegHandler(obj);

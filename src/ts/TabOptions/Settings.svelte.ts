@@ -4,7 +4,7 @@ import UpdateJsonProperties from "../UpdateJSONProperties";
 // See the $effects in `App.svelte` for the logic used to save this object in the LocalStorage every time it's changed.
 
 let Settings = {
-    version: "0.11.x",
+    version: "0.12.x",
     storageMethod: "link",
     useMultiThreaded: false,
     enableWorkerFS: false,
@@ -60,6 +60,10 @@ let Settings = {
 }
 const json = JSON.parse(localStorage.getItem("ffmpegWeb-LastGeneralSettings") ?? "{}");
 Settings = UpdateJsonProperties(json, Settings);
+// Site policy: single-thread ffmpeg.wasm 0.12.x only (no SharedArrayBuffer / COOP).
+Settings.version = "0.12.x";
+Settings.useMultiThreaded = false;
+Settings.enableWorkerFS = false;
 
 let state = $state(Settings);
 export default state;

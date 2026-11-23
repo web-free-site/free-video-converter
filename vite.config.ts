@@ -18,6 +18,6 @@ export default defineConfig({
   },
   base: "",
   optimizeDeps: {
-    exclude: ["ffmpeg12", "ffmpeg11"],
+    exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
   },
 })

@@ -15,7 +15,7 @@ import FileDivider from "./FileDivider";
  * @param handle if provided, the files will be saved using the File System API
  */
 export default async function InputLogic(generalFiles: File[], handle?: FileSystemDirectoryHandle) {
-    const obj = new ffmpeg(Settings.version as "0.11.x");
+    const obj = new ffmpeg(Settings.version as "0.12.x");
     await obj.promise;
     const fileSave = new FileSaver(localStorage.getItem("ffmpegWeb-DefaultStorageMethod") ?? "link", handle);
     await fileSave.promise;

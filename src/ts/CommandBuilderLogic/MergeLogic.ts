@@ -15,7 +15,7 @@ import Writables from "../Writables.svelte";
  */
 
 export default async function MergeLogic(files: File[], handle?: FileSystemDirectoryHandle) {
-    const obj = new ffmpeg(Settings.version as "0.11.x");
+    const obj = new ffmpeg(Settings.version as "0.12.x");
     await obj.promise;
     CreateTopDialog(`${getLang("Started operation")} ${obj.operationId + 1}! ${getLang(`Change the Operation ID from the "Conversion Status" tab to see the current progress.`)}`, "OperationStarted");
     /**

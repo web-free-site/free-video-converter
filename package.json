@@ -25,10 +25,10 @@
     "wrangler": "^3.94.0"
   },
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@zip.js/zip.js": "^2.7.60",
     "context-filter-polyfill": "^0.3.21",
-    "ffmpeg11": "npm:@ffmpeg/ffmpeg@^0.11.6",
-    "ffmpeg12": "npm:@ffmpeg/ffmpeg@^0.12.10",
     "jszip": "^3.10.1"
   }
 }
