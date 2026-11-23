@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/prerender-seo.mjs && node scripts/generate-sitemap.mjs && node scripts/inject-more-tools.mjs",
+    "build": "vite build && node scripts/prerender-seo.mjs && node scripts/generate-sitemap.mjs && node scripts/inject-more-tools.mjs && node scripts/inject-hub-legal.mjs",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
