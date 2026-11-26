@@ -10,14 +10,20 @@
     content="Convert local MOV, MKV, WebM, AVI, and MP4 videos online without uploading. Powered by ffmpeg.wasm in your browser. Free Video Converter by web-free.site." />
   <link rel="canonical" href="https://free-video-converter.web-free.site/" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Free Video Converter" />
+  <meta property="og:title"
+    content="Free Video Converter — MOV, MKV, WebM, AVI to MP4 in your browser" />
   <meta property="og:description"
-    content="Convert video files to MP4 locally using FFmpeg WebAssembly. No upload, no account." />
+    content="Convert MOV, MKV, WebM, AVI, and MP4 on your device. FFmpeg WebAssembly runs in the tab—no upload, no sign-up." />
   <meta property="og:url" content="https://free-video-converter.web-free.site/" />
+  <meta property="og:site_name" content="Free Video Converter" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title"
+    content="Free Video Converter — MOV, MKV, WebM, AVI to MP4 in your browser" />
+  <meta name="twitter:description"
+    content="Convert video to MP4 locally in your browser with FFmpeg.wasm. No account required." />
   <meta name="theme-color" content="#0d1117" />
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Free Video Converter","url":"https://free-video-converter.web-free.site/","applicationCategory":"MultimediaApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Convert local video files to MP4 in the browser with FFmpeg WebAssembly."}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are my videos uploaded to a server?","acceptedAnswer":{"@type":"Answer","text":"No. Conversion runs entirely in your browser using WebAssembly."}},{"@type":"Question","name":"Which formats can I convert?","acceptedAnswer":{"@type":"Answer","text":"MOV, MKV, WebM, AVI, MP4, and other common containers you open from your device."}},{"@type":"Question","name":"What is the default output?","acceptedAnswer":{"@type":"Answer","text":"MP4 with H.264 video and AAC audio when re-encoding is needed."}}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Are my videos uploaded to a server when I use this Free Video Converter?","acceptedAnswer":{"@type":"Answer","text":"No. Files stay on your computer or phone. FFmpeg WebAssembly loads in your browser tab and converts the video locally. Nothing is sent to our servers for encoding."}},{"@type":"Question","name":"Which video formats can I convert to MP4?","acceptedAnswer":{"@type":"Answer","text":"Common containers including MOV (QuickTime), MKV, WebM, AVI, and MP4. Pick a file from your device, choose MP4 output, and download the result when conversion finishes."}},{"@type":"Question","name":"Do I need an account or installed software?","acceptedAnswer":{"@type":"Answer","text":"No account and no desktop install. Open the page, allow the FFmpeg core to load once, add your file, and convert. Works on modern Chrome, Edge, Firefox, and Safari with enough free memory for your clip."}},{"@type":"Question","name":"What quality and codec does the output use?","acceptedAnswer":{"@type":"Answer","text":"MP4 is the default. Depending on your settings, the tool can copy streams without re-encoding or re-encode to widely compatible H.264 video and AAC audio. Adjust bitrate and resolution in the conversion options before you start."}},{"@type":"Question","name":"Why is my browser slow during conversion?","acceptedAnswer":{"@type":"Answer","text":"Video encoding is CPU-intensive. Long or high-resolution files take more time and RAM. Close other heavy tabs, keep the device plugged in on laptops, and use shorter clips if you only need a segment. The first visit also downloads the FFmpeg WebAssembly core, which is cached for later use."}}]}</script>
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet">
   <link rel="manifest" href="./manifest.json" />
@@ -34,6 +40,15 @@
     .wf-site-footer a{color:#8ab4f8}
     .seo-prerender{max-width:960px;margin:0 auto 1rem;padding:0 1rem;font-family:system-ui,sans-serif;color:#e6edf3}
     .seo-prerender h1{font-size:1.5rem}
+    .wf-home-seo{max-width:960px;margin:2rem auto 1.5rem;padding:0 1rem 2rem;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.65;color:#e6edf3}
+    .wf-home-seo h1{margin:0 0 1rem;font-size:1.75rem;font-weight:700;line-height:1.25}
+    .wf-home-seo h2{margin:1.75rem 0 .75rem;font-size:1.2rem;font-weight:600}
+    .wf-home-seo p{margin:0 0 1rem}
+    .wf-home-seo ol,.wf-home-seo ul{margin:0 0 1rem;padding-left:1.35rem}
+    .wf-home-seo li{margin-bottom:.4rem}
+    .wf-home-seo a{color:#8ab4f8}
+    .wf-home-seo .wf-faq-item{margin:0 0 1.25rem}
+    .wf-home-seo .wf-faq-item h3{margin:0 0 .35rem;font-size:1rem;font-weight:600}
     .wf-ad-leader{margin:8px auto;text-align:center;max-width:728px}
     .wf-ad-sidebar iframe{border:0;display:block;margin:0 auto}
   </style>
@@ -50,6 +65,90 @@
   </form>
   <div class="wf-ad-leader" data-ad-slot="homeTop728x90"></div>
   <div id="app"></div>
+  <article id="wf-home-seo" class="wf-home-seo">
+    <h1>Free Video Converter</h1>
+    <p>This <strong>free video converter</strong> turns local video files into MP4 (and other outputs you choose)
+      entirely in your browser. It is built on <a href="https://ffmpegwasm.netlify.app/" rel="noopener">ffmpeg.wasm</a>
+      and the same conversion ideas as the open-source ffmpeg-web UI—specialized for everyday format changes such as
+      MOV to MP4, MKV to MP4, WebM to MP4, or AVI to MP4. There is no cloud queue, no email sign-up, and no file
+      upload step: you pick a clip from your device, FFmpeg runs inside the tab, and you download the finished file
+      when the progress bar completes.</p>
+    <p>Unlike many “online converters” that send your footage to a remote server, this tool keeps your media on your
+      machine. That matters for client work, internal training videos, family recordings, and anything you would not
+      want copied to a third-party datacenter. The page may show ads and standard web analytics, but your video bytes
+      are not submitted for encoding on our infrastructure. For a longer walkthrough, see the hub guide
+      <a href="https://web-free.site/guides/convert-video-to-mp4-online-free/?ref=free-video-converter">Convert MKV,
+        MOV, or WebM to MP4 online free</a> on <a
+        href="https://web-free.site/?ref=free-video-converter">web-free.site</a>, which lists this converter among
+      other privacy-minded browser tools.</p>
+
+    <h2>How to convert video in your browser</h2>
+    <ol>
+      <li><strong>Open the converter</strong> and wait for the FFmpeg WebAssembly core to finish loading the first
+        time (later visits use the browser cache).</li>
+      <li><strong>Add your source file</strong> using the file picker. Supported containers include MOV, MKV, WebM,
+        AVI, and MP4 from disk, not from a URL or streaming link.</li>
+      <li><strong>Choose output settings</strong>—typically MP4 with H.264 and AAC for broad compatibility. You can
+        adjust resolution, bitrate, or copy streams when remuxing is enough.</li>
+      <li><strong>Start conversion</strong> and keep the tab open until FFmpeg reports done. Large files need more RAM
+        and CPU; closing other heavy apps can help.</li>
+      <li><strong>Download the result</strong> and play it locally. If you only need audio, use the
+        <a href="https://free-video-to-mp3.web-free.site/?ref=free-video-converter">Free Video to MP3</a> tool;
+        to shrink file size, try the
+        <a href="https://free-video-compressor.web-free.site/?ref=free-video-converter">Free Video Compressor</a>.
+      </li>
+    </ol>
+
+    <h2>Privacy and in-browser processing</h2>
+    <p>Conversion logic executes in WebAssembly inside your browser. We do not receive your filenames or file contents
+      for processing. Settings you change may be stored in <code>localStorage</code> on your device so the UI remembers
+      your last format choices. FFmpeg core files are fetched from a public CDN and cached locally, similar to other
+      ffmpeg.wasm apps. Read the <a href="/privacy">privacy policy</a> on this site for how analytics and advertising
+      partners may collect page-view data—separate from your actual video files.</p>
+
+    <h2>Common use cases</h2>
+    <ul>
+      <li><strong>iPhone or camera MOV clips</strong> that should play on Windows or Android as MP4.</li>
+      <li><strong>MKV files from downloads or rips</strong> that you want in MP4 for editors or TVs that reject Matroska.
+      </li>
+      <li><strong>WebM screen recordings</strong> from the browser or OBS that need MP4 for PowerPoint, Slack, or
+        social uploads with stricter format rules.</li>
+      <li><strong>Legacy AVI archives</strong> you are modernizing before storage or sharing.</li>
+      <li><strong>Quick remux jobs</strong> where video and audio codecs already fit MP4 and you only need a new
+        container without full re-encoding—faster and preserves quality when settings allow stream copy.</li>
+    </ul>
+  <p>Explore more utilities on the <a href="https://web-free.site/?ref=free-video-converter">web-free.site</a> hub, or
+      jump to format-specific help pages on this site: <a href="/mov-to-mp4">MOV to MP4</a>,
+      <a href="/mkv-to-mp4">MKV to MP4</a>, <a href="/webm-to-mp4">WebM to MP4</a>, and
+      <a href="/avi-to-mp4">AVI to MP4</a>.</p>
+
+    <h2 id="wf-faq-heading">Frequently asked questions</h2>
+    <div class="wf-faq-item">
+      <h3>Are my videos uploaded to a server when I use this Free Video Converter?</h3>
+      <p>No. Files stay on your device. FFmpeg WebAssembly runs in your browser tab; encoding is not performed on our
+        servers.</p>
+    </div>
+    <div class="wf-faq-item">
+      <h3>Which video formats can I convert to MP4?</h3>
+      <p>MOV, MKV, WebM, AVI, MP4, and other common containers you open from local storage. Remote URLs and YouTube
+        links are not supported—only files you already have.</p>
+    </div>
+    <div class="wf-faq-item">
+      <h3>Do I need an account or installed software?</h3>
+      <p>No account and no install. Use a current desktop or mobile browser with enough free memory for your file size.
+      </p>
+    </div>
+    <div class="wf-faq-item">
+      <h3>What quality and codec does the output use?</h3>
+      <p>MP4 is the default. You can copy compatible streams or re-encode to H.264 and AAC. Tune bitrate and resolution in
+        the options panel before converting.</p>
+    </div>
+    <div class="wf-faq-item">
+      <h3>Why is my browser slow during conversion?</h3>
+      <p>Encoding is CPU-heavy. Long or 4K clips take more time. The first load also downloads the FFmpeg core; later
+        sessions reuse the cache.</p>
+    </div>
+  </article>
   <footer class="wf-site-footer" id="wf-site-footer">
     <p><strong>Free Video Converter</strong> — convert video to MP4 in your browser. Files never leave your device.</p>
     <p>UI based on <a href="https://github.com/dinoosauro/ffmpeg-web" rel="noopener">ffmpeg-web</a> (MIT, Dinoosauro). Powered by
