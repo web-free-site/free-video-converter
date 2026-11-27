@@ -93,15 +93,15 @@
         {#if Settings.screenSaver.options.showConversionName}
             <div class="screenContainer floatLeft">
                 {#if Writables.conversionFileDone.currentFile[currentConversion] === 0}
-                    <h1>{getLang("No conversion started")}</h1>
+                    <h2>{getLang("No conversion started")}</h2>
                 {:else if Writables.conversionFileDone.currentFile[currentConversion] === -1}
-                    <h1>
+                    <h2>
                         {getLang("The selected conversion (Conversion")}
                         {currentConversion + 1})
                         {getLang("has ended!")}
-                    </h1>
+                    </h2>
                 {:else}
-                    <h1>{getLang("Converting file:")}</h1>
+                    <h2>{getLang("Converting file:")}</h2>
                     <h2>«{Writables.conversionFileDone.fileNames[currentConversion]}»</h2>
                     <progress
                         value={Writables.conversionFileDone.currentFile[currentConversion] - 1}
@@ -148,7 +148,7 @@
         background-color: var(--background);
         cursor: none;
     }
-    h1 {
+    h2 {
         font-size: clamp(28px, 7vw, 3em);
         margin: 0px;
     }
